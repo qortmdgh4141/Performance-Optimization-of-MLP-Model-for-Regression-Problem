@@ -150,7 +150,7 @@
   plt.show()
   ```
   
-  <img src="https://github.com/qortmdgh4141/Performance-Optimization-of-MLP-Model-for-Regression-Problem/blob/main/image/heatmap_graph.png?raw=true" width="640">
+  <img src="https://github.com/qortmdgh4141/Performance-Optimization-of-MLP-Model-for-Regression-Problem/blob/main/image/corr_heatmap_graph.png?raw=true" width="640">
   
   ```
   # 독립 변수 간 매우 강한 상관관계를 가지는 변수가 있는 경우, 다중공선성(multicollinearity) 문제가 발생함 
