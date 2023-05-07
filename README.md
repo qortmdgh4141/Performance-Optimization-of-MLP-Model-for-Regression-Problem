@@ -291,7 +291,7 @@
     
 - _The purpose of this study was to train and evaluate a multilayer perceptron model on the Diabetes 130-US hospitals for years 1999-2008 Data Set. I set the number of hidden racers by referring to the optimal model structure proposed in the paper "Diabetes Mellitus Diagnosis Using Artificial Neural Networks with Fewer Features", increased the model complexity by making the number of nodes in each layer about 10 times larger than the number of nodes set in the paper, and added batch regularization and dropout layers to solve the problems of internal covariate shift and overfitting. In addition, I improved the performance of the existing model by using variable selection techniques, scaling techniques, and initialization techniques to solve multicollinearity problems and to prevent problems such as gradients vanishing._ <br/>
 
-- _The following graph shows the evolution of the loss with increasing epoch, and we can see that overfitting did not occur due to the impact of the aforementioned batch regularization and dropout layer._ <br/><br/><br/>
+- _The following graph shows the evolution of the loss with increasing epoch, and I can see that overfitting did not occur due to the impact of the aforementioned batch regularization and dropout layer._ <br/><br/><br/>
 
   ```
   # loss 그래프 출력
@@ -328,11 +328,11 @@
 
 - _However, it was found that underfitting occurs, where the predictive performance on the training data does not improve because it does not sufficiently reflect the complexity of the data after some learning progress._ <br/>
 
-- _This means that the model has been oversimplified, and we believe that the following reasons contributed to this:_ <br/>
+- _This means that the model has been oversimplified, and I believe that the following reasons contributed to this:_ <br/>
 
   - _Low Model Complexity_<br/>
   
-    - _We believe that underfitting occurs because the model is too simple or limited._<br/>
+    - _I believe that underfitting occurs because the model is too simple or limited._<br/>
     
     - _This does not mean that making the current model structure more complex is a good solution. This is because the amount of training data is currently small, and making the model structure more complex is very likely to lead to overfitting._ <br/><br/>
     
