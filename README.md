@@ -3,9 +3,9 @@
   
 ### 1. &nbsp; Research Objective <br/><br/>
 
-- _This study aims to train and evaluate a multilayer perceptron model on the Diabetes 130-US hospitals for years 1999-2008 dataset. To design the optimal model, we referred to the method proposed in the paper "Diabetes Mellitus Diagnosis Using Artificial Neural Networks with Fewer Features". In this paper, the authors tested the number of hidden layers from 2 to 8 to optimize the number of hidden layers for the Pima Indians Diabetes Database dataset and found that 3 or 4 hidden layers were the optimal model structure._  <br/>
+- _This study aims to train and evaluate a multilayer perceptron model on the Diabetes 130-US hospitals for years 1999-2008 dataset. To design the optimal model, I referred to the method proposed in the paper "Diabetes Mellitus Diagnosis Using Artificial Neural Networks with Fewer Features". In this paper, the authors tested the number of hidden layers from 2 to 8 to optimize the number of hidden layers for the Pima Indians Diabetes Database dataset and found that 3 or 4 hidden layers were the optimal model structure._  <br/>
 
-- _Since the dataset used in this study is similar to the dataset used in the paper, we limited the network structure to three hidden layers based on the experiments in the paper. However, it is not completely identical to the network structure presented in the paper.In this study, we increased the number of nodes in each layer by about 10 times than the number of nodes presented in the paper to increase the complexity of the model. In addition, we added batch regularization and dropout layers to solve internal covariate shift and overfitting problems. Furthermore, we conducted experiments based on various trial and error methods, such as variable selection techniques, scaling techniques, and initialization techniques, to solve multicollinearity problems and improve the model's performance. Through these efforts, we hope to improve performance of the model and prevented problems such as gradient vanishing._ <br/><br/><br/> 
+- _Since the dataset used in this study is similar to the dataset used in the paper, I limited the network structure to three hidden layers based on the experiments in the paper. However, it is not completely identical to the network structure presented in the paper.In this study, I increased the number of nodes in each layer by about 10 times than the number of nodes presented in the paper to increase the complexity of the model. In addition, I added batch regularization and dropout layers to solve internal covariate shift and overfitting problems. Furthermore, I conducted experiments based on various trial and error methods, such as variable selection techniques, scaling techniques, and initialization techniques, to solve multicollinearity problems and improve the model's performance. Through these efforts, I hope to improve performance of the model and prevented problems such as gradient vanishing._ <br/><br/><br/> 
 
 ### 2. &nbsp; Key Components of the Neural Network Model and Experimental Settings  <br/><br/>
 
@@ -13,23 +13,23 @@
 
   - _As the model has 6 input variables and 1 target variable, the input/output nodes were configured accordingly._ <br/>
   
-  - _For reference, the diabetes dataset (Diabetes 130-US hospitals for years 1999-2008 Data Set) has 10 characteristics, but we removed the characteristics of age and sex from the input variables because we thought they were variables to be excluded from the analysis._ <br/>
+  - _For reference, the diabetes dataset (Diabetes 130-US hospitals for years 1999-2008 Data Set) has 10 characteristics, but I removed the characteristics of age and sex from the input variables because I thought they were variables to be excluded from the analysis._ <br/>
   
-  - _In addition, to avoid multicollinearity issues due to highly correlated independent variables, we used a variable selection technique to remove two highly correlated variables._ <br/><br/>
+  - _In addition, to avoid multicollinearity issues due to highly correlated independent variables, I used a variable selection technique to remove two highly correlated variables._ <br/><br/>
 
 - _Hidden Layers & Batch Normalization & Dropout_<br/>
 
   - _There are a total of 3 hidden layers, with 60 nodes in the 1st and 3rd hidden layers, and 120 nodes in the 2nd hidden layer._<br/>
   
-  - _To prevent the internal covariate shift problem where the distribution of input data changes with each hidden layer, we used batch normalization layers._ <br/>
+  - _To prevent the internal covariate shift problem where the distribution of input data changes with each hidden layer, I used batch normalization layers._ <br/>
   
-  - _In addition, we used dropout layers, which randomly drop out some neurons during the learning process, to prevent overfitting and improve the generalization performance of the model._ <br/><br/>
+  - _In addition, I used dropout layers, which randomly drop out some neurons during the learning process, to prevent overfitting and improve the generalization performance of the model._ <br/><br/>
 
 - _Activation Function: ReLU (Rectified Linear Unit)_ <br/>
 
   - _I set the activation function to the ReLU function, which is a non-linear function that outputs 0 when the input value is less than 0, and outputs the input value itself when it is greater than 0._
 
-  - _Also, depending on how you initialize the hidden layer weights when using the ReLU activation function, the gradient may disappear during the model training process. To avoid this problem, we used the He initialization technique, which is a neural network initialization method that takes nonlinearity into account like the ReLU activation function._<br/><br/>
+  - _Also, depending on how you initialize the hidden layer weights when using the ReLU activation function, the gradient may disappear during the model training process. To avoid this problem, I used the He initialization technique, which is a neural network initialization method that takes nonlinearity into account like the ReLU activation function._<br/><br/>
   
 - _Optimization Algorithm : Adam (Adaptive Moment Estimation)_ <br/>
 
