@@ -135,6 +135,9 @@
   plt.show()
   ```
   
+  <img src="https://github.com/qortmdgh4141/Performance-Optimization-of-MLP-Model-for-Regression-Problem/blob/main/image/density_graph.png?raw=true" width="930">
+  
+  
   ```
   # 각 변수 간 상관계수를 히트맵 그래프로 출력 
   # s1 변수와 s2 변수들은 양의 선형적 관계를 가지는 매우 강한 상관관계를 가지고 있음
@@ -308,7 +311,7 @@
   <br/>
   
   
-<img src="https://github.com/qortmdgh4141/Comparing-Performance-of-Shallow-and-Deep-MLP-for-Regression-Analysis/blob/main/image/shallow_deep_mape_graph.png?raw=true" width="930">
+<img src="https://github.com/qortmdgh4141/Performance-Optimization-of-MLP-Model-for-Regression-Problem/blob/main/image/density_graph.png?raw=true" width="930">
 
 - _However, it was found that underfitting occurs,  where the predictive performance on the training data does not improve because it does not sufficiently reflect the complexity of the data after some learning progress._ <br/><br/><br/>
 
