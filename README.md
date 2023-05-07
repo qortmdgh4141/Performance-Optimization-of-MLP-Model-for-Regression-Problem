@@ -309,13 +309,7 @@
   plt.legend()
   plt.show()
   ```
-  <br/>
   
-  
-<img src="https://github.com/qortmdgh4141/Performance-Optimization-of-MLP-Model-for-Regression-Problem/blob/main/image/loss_graph.png?raw=true" width="640">
-
-- _However, it was found that underfitting occurs,  where the predictive performance on the training data does not improve because it does not sufficiently reflect the complexity of the data after some learning progress._ <br/><br/><br/>
-
   ```
   # 예측값 대비 실게값의 산포도
   y_pred = model.predict(x_test_minmax)
@@ -329,20 +323,20 @@
   plt.colorbar()
   plt.show()
   ```
+  <br/>
+  <img src="https://github.com/qortmdgh4141/Performance-Optimization-of-MLP-Model-for-Regression-Problem/blob/main/image/scatter_plot_line_graph.png?raw=true" weight="1280">
 
-<img src="https://github.com/qortmdgh4141/Performance-Optimization-of-MLP-Model-for-Regression-Problem/blob/main/image/actual_predicted_graph.png?raw=true" height="320">
-
-- _However, it was found that underfitting occurs,  where the predictive performance on the training data does not improve because it does not sufficiently reflect the complexity of the data after some learning progress._ <br/><br/><br/>
+- _However, it was found that underfitting occurs,  where the predictive performance on the training data does not improve because it does not sufficiently reflect the complexity of the data after some learning progress._ <br/>
 
 - _This means that the model has been oversimplified, and we believe that the following reasons contributed to this:_ <br/>
 
-  - _Low Model Complexity._<br/>
+  - _Low Model Complexity_<br/>
   
     - _We believe that underfitting occurs because the model is too simple or limited._<br/>
     
-    - _This does not mean that making the current model structure more complex is a good solution. This is because the amount of training data is currently small, and making the model structure more complex is very likely to lead to overfitting._<br/><br/>
+    - _This does not mean that making the current model structure more complex is a good solution. This is because the amount of training data is currently small, and making the model structure more complex is very likely to lead to overfitting._ <br/><br/>
     
-  - _Lack of Variable Diversity ._<br/>
+  - _Lack of Variable Diversity_<br/>
   
     - _It is determined that underfitting occurred due to a lack of variable diversity in the dataset._<br/>
     
@@ -352,11 +346,11 @@
     
 - _Based on the scatter plot of predicted values compared to actual values, it can be seen that the performance of the prediction model is not very accurate. Therefore, to improve the performance of the regression model in the future, the following solutions can be suggested:_
 
-  - _Diversity and Quality of Data._<br/>
+  - _Diversity and Quality of Data_<br/>
   
     - _The unbalanced distribution of data can greatly affect the performance of the model.Therefore, if the data is collected considering the diversity of the data and preprocessed so as not to harm the diversity of the collected data set, the performance of the model will be improved._<br/>
 
-  - _Feature Engineering._<br/>
+  - _Feature Engineering_<br/>
   
     - _Feature engineering is known to have a significant impact on the performance of a prediction model.Therefore, by extracting more diverse and sophisticated features or introducing new variables, it is expected to improve the performance of the model._<br/> <br/> <br/>
  
