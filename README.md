@@ -3,50 +3,59 @@
   
 ### 1. &nbsp; Research Objective <br/><br/>
 
-- _This study aims to train and evaluate a multilayer perceptron model on the Diabetes 130-US hospitals for years 1999-2008 dataset. To design the optimal model, we referred to the method proposed in the paper "Diabetes Mellitus Diagnosis Using Artificial Neural Networks with Fewer Features". In this paper, the authors tested the number of hidden layers from 2 to 8 to optimize the number of hidden layers for the Pima Indians Diabetes Database dataset and found that 3 or 4 hidden layers were the optimal model structure.
+- _This study aims to train and evaluate a multilayer perceptron model on the Diabetes 130-US hospitals for years 1999-2008 dataset. To design the optimal model, we referred to the method proposed in the paper "Diabetes Mellitus Diagnosis Using Artificial Neural Networks with Fewer Features". In this paper, the authors tested the number of hidden layers from 2 to 8 to optimize the number of hidden layers for the Pima Indians Diabetes Database dataset and found that 3 or 4 hidden layers were the optimal model structure._  <br/>
 
-
-Since the dataset used in this study is similar to the dataset used in the paper, we limited the network structure to three hidden layers based on the experiments in the paper. However, it is not completely identical to the network structure presented in the paper.In this study, we increased the number of nodes in each layer by about 10 times than the number of nodes presented in the paper to increase the complexity of the model. In addition, we added batch regularization and dropout layers to solve internal covariate shift and overfitting problems. Furthermore, we conducted experiments based on various trial and error methods, such as variable selection techniques, scaling techniques, and initialization techniques, to solve multicollinearity problems and improve the model's performance. Through these efforts, we hope to improve performance of the model and prevented problems such as gradient vanishing._ <br/><br/><br/> 
+- _Since the dataset used in this study is similar to the dataset used in the paper, we limited the network structure to three hidden layers based on the experiments in the paper. However, it is not completely identical to the network structure presented in the paper.In this study, we increased the number of nodes in each layer by about 10 times than the number of nodes presented in the paper to increase the complexity of the model. In addition, we added batch regularization and dropout layers to solve internal covariate shift and overfitting problems. Furthermore, we conducted experiments based on various trial and error methods, such as variable selection techniques, scaling techniques, and initialization techniques, to solve multicollinearity problems and improve the model's performance. Through these efforts, we hope to improve performance of the model and prevented problems such as gradient vanishing._ <br/><br/><br/> 
 
 ### 2. &nbsp; Key Components of the Neural Network Model and Experimental Settings  <br/><br/>
 
-- _Input Nodes : 1_ <br/>
-_Output Nodes : 1_ <br/>
+- _Input Nodes & Output Nodes_<br/>
 
-  - _The model includes one input node and one output node due to the single input and output value_ <br/><br/>
+  - _As the model has 6 input variables and 1 target variable, the input/output nodes were configured accordingly._ <br/>
+  
+  - _For reference, the diabetes dataset (Diabetes 130-US hospitals for years 1999-2008 Data Set) has 10 characteristics, but we removed the characteristics of age and sex from the input variables because we thought they were variables to be excluded from the analysis._ <br/>
+  
+  - _In addition, to avoid multicollinearity issues due to highly correlated independent variables, we used a variable selection technique to remove two highly correlated variables._ <br/><br/>
 
-- Number of Hidden Layers in Shallow Model : 1 <br/>
-Number of Hidden Nodes in Shallow Model : 2 <br/>
-Number of Hidden Layers in Deep Model : 4 <br/>
-Number of Hidden Nodes in Deep Model : 8 <br/>
+- _Hidden Layers & Batch Normalization & Dropout_<br/>
 
-  - _The number of hidden layers in a neural network is a key factor that affects its ability to learn complex patterns._
-  - _Generally,  increasing the number of hidden layers can provide advantages in learning complex features, but it may also come with the trade-offs of larger model size and longer training time._ 
-  - _On the other hand, having fewer hidden layers can make the model simpler and faster to train, but it may not be able to capture complex relationships in the data._ <br/><br/>
+  - _There are a total of 3 hidden layers, with 60 nodes in the 1st and 3rd hidden layers, and 120 nodes in the 2nd hidden layer._<br/>
+  
+  - _To prevent the internal covariate shift problem where the distribution of input data changes with each hidden layer, we used batch normalization layers._ <br/>
+  
+  - _In addition, we used dropout layers, which randomly drop out some neurons during the learning process, to prevent overfitting and improve the generalization performance of the model._ <br/><br/>
 
-- _Activation Function : Logistic Function (Sigmoid Function)_ <br/>
+- _Activation Function: ReLU (Rectified Linear Unit)_ <br/>
 
-  - _In this experiment, instead of the commonly used relu function in regression analysis, the logistic function (sigmoid function) is utilized, which outputs values between 0 and 1._
+  - _I set the activation function to the ReLU function, which is a non-linear function that outputs 0 when the input value is less than 0, and outputs the input value itself when it is greater than 0._
 
-  - _When training with a small dataset, overfitting can be a problem due to the lack of diversity in the data._ 
-  - _However, the logistic function has the unique property of saturation as the slope approaches 0. By leveraging this property, the number of nodes in the hidden layer can be limited to adjust the model size, leading to model simplification, prevention of overfitting, and improvement of generalization ability._ <br/><br/>
+  - _Also, depending on how you initialize the hidden layer weights when using the ReLU activation function, the gradient may disappear during the model training process. To avoid this problem, we used the He initialization technique, which is a neural network initialization method that takes nonlinearity into account like the ReLU activation function._<br/><br/>
+  
+- _Optimization Algorithm : Adam (Adaptive Moment Estimation)_ <br/>
 
-- _Optimization Algorithm : L-BFGS (Limited-memory BFGS)_ <br/>
+  - _I used the Adam (Adaptive Moment Estimation) optimization algorithm, which combines the advantages of Momentum, which adjusts the learning rate considering the direction of the gradient, and RMSProp, which adjusts the learning rate considering the magnitude of the gradient._<br/><br/>
 
-  - _L-BFGS estimates gradients by using a subset of the data instead of processing the entire dataset at once._ 
-  - _Due to the potential for memory shortages, L-BFGS may not be suitable for processing very large datasets, and other optimization algorithms should be considered._
-  - _However, when working with small datasets, L-BFGS can be advantageous in reducing training time and memory usage._ <br/><br/>
+- _Cost Function : MSE (Mean Squared Error)_ <br/>
 
-- _Cost Function : MSE (Mean Squared Error_) <br/>
+  - _I used the mean square error (MSE), which calculates the average of the squared differences between the predicted and actual values._<br/>
 
-  - _In regression analysis, the MSE (Mean Squared Error) is a commonly used evaluation metric that calculates the average of the squared differences between the predicted values and the actual values._ 
-  - _This makes the MSE a reliable indicator of the error between the predicted and actual values in the model._ <br/><br/>
+  - _MSE has the advantage of being easy to converge to the optimal value because the shift changes differently as you get closer to the optimal value, but it also has the disadvantage of being highly influenced by outliers._ <br/><br/>
+
+- _Evaluation Metric: MAPE (Mean Absolute Percentage Error)_ <br/>
+
+  - _I used MAPE (Mean Absolute Percentage Error), which calculates the mean absolute percentage difference between predicted values and actual values._<br/>
+
+  - _MAPE is one of the most commonly used metrics in regression analysis and is characterized by the fact that the larger the difference between predicted and actual values, the larger the value of MAPE. In other words, the better the model predicts, the smaller the value of MAPE will be._ <br/><br/>
+
 
 - _Maximum Number of Learning Iterations : 100_ <br/>
 
-  - _In this experiment, the model is trained by iterating up to a maximum of 100 times._ 
-  - _The number of iterations during training affects the speed and accuracy of the model, and I, as the researcher conducting the experiment, have set the number of iterations based on my experience of tuning deep learning models._ 
-  - _Setting the number of iterations too low can result in underfitting, where the model is not trained enough, while setting it too high can result in overfitting._ 
+  - _In this experiment, the model is trained by iterating up to a maximum of 100 times._<br/>
+  
+  - _The number of iterations during training affects the speed and accuracy of the model, and I, as the researcher conducting the experiment, have set the number of iterations based on my experience of tuning deep learning models._<br/>
+  
+  - _Setting the number of iterations too low can result in underfitting, where the model is not trained enough, while setting it too high can result in overfitting._<br/> 
+  
   - _Therefore, I have chosen what I believe to be the most appropriate number of iterations._ <br/> <br/> <br/> 
 
 ### 3. &nbsp; Data Preprocessing and Analysis <br/><br/>
