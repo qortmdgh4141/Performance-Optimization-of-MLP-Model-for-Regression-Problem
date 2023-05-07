@@ -312,7 +312,7 @@
   <br/>
   
   
-<img src="https://github.com/qortmdgh4141/Performance-Optimization-of-MLP-Model-for-Regression-Problem/blob/main/image/density_graph.png?raw=true" width="930">
+<img src="https://github.com/qortmdgh4141/Performance-Optimization-of-MLP-Model-for-Regression-Problem/blob/main/image/loss_graph.png?raw=true" width="640">
 
 - _However, it was found that underfitting occurs,  where the predictive performance on the training data does not improve because it does not sufficiently reflect the complexity of the data after some learning progress._ <br/><br/><br/>
 
@@ -330,7 +330,7 @@
   plt.show()
   ```
 
-<img src="https://github.com/qortmdgh4141/Comparing-Performance-of-Shallow-and-Deep-MLP-for-Regression-Analysis/blob/main/image/shallow_deep_mape_graph.png?raw=true" width="930">
+<img src="https://github.com/qortmdgh4141/Performance-Optimization-of-MLP-Model-for-Regression-Problem/blob/main/image/actual_predicted_graph.png?raw=true" height="320">
 
 - _However, it was found that underfitting occurs,  where the predictive performance on the training data does not improve because it does not sufficiently reflect the complexity of the data after some learning progress._ <br/><br/><br/>
 
@@ -341,7 +341,7 @@
     - _We believe that underfitting occurs because the model is too simple or limited._<br/>
     
     - _This does not mean that making the current model structure more complex is a good solution. This is because the amount of training data is currently small, and making the model structure more complex is very likely to lead to overfitting._<br/><br/>
-    - 
+    
   - _Lack of Variable Diversity ._<br/>
   
     - _It is determined that underfitting occurred due to a lack of variable diversity in the dataset._<br/>
