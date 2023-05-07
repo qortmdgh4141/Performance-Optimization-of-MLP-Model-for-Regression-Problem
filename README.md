@@ -48,9 +48,9 @@
   - _MAPE is one of the most commonly used metrics in regression analysis and is characterized by the fact that the larger the difference between predicted and actual values, the larger the value of MAPE. In other words, the better the model predicts, the smaller the value of MAPE will be._ <br/><br/>
 
 
-- _Maximum Number of Learning Iterations : 100_ <br/>
+- _Maximum Number of Learning Iterations_ <br/>
 
-  - _In this experiment, the model is trained by iterating up to a maximum of 100 times._<br/>
+  - _In this experiment, the model is trained by iterating up to a maximum of 1000 times._<br/>
   
   - _The number of iterations during training affects the speed and accuracy of the model, and I, as the researcher conducting the experiment, have set the number of iterations based on my experience of tuning deep learning models._<br/>
   
@@ -63,80 +63,136 @@
 - _**Package Settings**_ <br/> 
   
   ```
-  # MLP의 회귀분석을 위해서 sklearn의 MLPRegressor 모듈을 사용
-  from sklearn.neural_network import MLPRegressor
-  from sklearn.preprocessing import MinMaxScaler
+  from sklearn.datasets import load_diabetes
   from sklearn.model_selection import train_test_split
+  from sklearn.preprocessing import MinMaxScaler, StandardScaler
   from sklearn.metrics import mean_absolute_percentage_error
+
+  from keras import initializers
+  from keras.optimizers import Adam
+  from keras.models import Sequential
+  from keras.layers import Dense, Dropout,BatchNormalization
+
   import numpy as np
+  import pandas as pd
+  import seaborn as sns
   import matplotlib.pyplot as plt
+  from IPython.display import display
   ```
 
-- _**Package Settings**_ <br/> 
-  
-  ```
-  # MLP의 회귀분석을 위해서 sklearn의 MLPRegressor 모듈을 사용
-  from sklearn.neural_network import MLPRegressor
-  from sklearn.preprocessing import MinMaxScaler
-  from sklearn.model_selection import train_test_split
-  from sklearn.metrics import mean_absolute_percentage_error
-  import numpy as np
-  import matplotlib.pyplot as plt
-  ```  
 - _**Data Preparation**_ <br/> 
   
   ```
-  # 입력값 : X 변수값의 범위는 1~100 사이의 정수로 지정
-  # 출력값 : X의 값에 대응하는 Y값 계산
-  x = np.array(range(1, 101))
-  y = np.sqrt(x)
+  # 당뇨병 데이터 셋트 로딩 : 입력 데이터(data), 목표 데이터(target)
+  diabetes = load_diabetes()
 
-  print(f"x 값의 범위 : {np.min(x)} ~ {np.max(x)}")
-  print(f"y 값의 범위 : {int(np.min(y))} ~ {int(np.max(y))}")
+  # 입력 데이터와 목표 데이터를 각각 데이터 프레임으로 변환
+  x_data = pd.DataFrame(diabetes.data, columns=diabetes.feature_names)
+  y_data = pd.DataFrame(diabetes.target, columns=['target'])
+
+  # 당뇨병 데이터 셋트에 NaN값이 존재하는지 확인
+  if x_data.isnull().values.any() or y_data.isnull().values.any():
+      print("- 당뇨병 데이터 셋트에는 NaN값이 존재합니다. -", end= "\n\n")
+  else:
+      print("- 당뇨병 데이터 셋트에는 NaN값이 존재하지 않습니다. -", end= "\n\n")
+  ```
+  
+  ```
+  # 입력 데이터를 출력
+  print(f"< 입력 데이터의 구성 : {x_data.shape[0]}행 x {x_data.shape[1]}열 >")
+  display(x_data)
+  ```
+  
+  ```
+  # 분석 대상에서 제외할 변수인 "age & sex" 열을 삭제  
+  x_data = x_data.drop(['age', 'sex'], axis=1) 
+
+  #  분석 대상에서 제외할 변수인 "age & sex" 열을 삭제한 입력 데이터를 출력
+  print(f"\n< 'age & sex' 열을 삭제한 입력 데이터의 구성 : {x_data.shape[0]}행 x {x_data.shape[1]}열 >")
+  display(x_data)
+  ```
+  
+  ```
+  # 목표 데이터를 출력
+  print(f"\n< 목표 데이터의 구성 : {y_data.shape[0]}행 x {y_data.shape[1]}열 >")
+  display(y_data)
   ```
   
 - _**Exploratory Data Analysis (EDA)**_ <br/> 
   
   ```
-  # X와 Y간의 관계를 그래프로 그려보면, X 값이 증가할 때 Y 값도 점차 증가하지만, 
-  # 그 증가 속도는 X 값이 증가함에 따라 감소하는 비선형 곡선
-  # 이러한 형태를 지니는 완만하게 증가하는 곡선을 로그 곡선(log curve)이라고 함
-  plt.figure(figsize=(12, 3))
-  plt.scatter(x, y, color='g')
-  plt.title('y=sqrt(x)')
-  plt.xlabel('X')
-  plt.ylabel('Y')
-  plt.legend(['Actual Data']) 
+  # 그래프로 데이터 분포를 파악하기 위해 입출력 데이터를 하나의 테이터 프레임으로 병합
+  concat_data = pd.concat([x_data, y_data], axis=1)
+  display(concat_data)
+  ```
+
+  ```
+  # 목표변수인 당뇨병 진행 상태(Diabetes Progression) 값을 10개의 계급으로 하는 밀도그래프를 출력
+  # 평균적으로 당뇨병 진행 상태(Diabetes Progression) 값은 100에 많이 분포 
+  sns.set(rc={'figure.figsize' : (15, 3)})
+  sns.kdeplot(data=concat_data, x='target', shade=True)
+  plt.xlabel('Diabetes Progression')
   plt.show()
   ```
-  <img src="https://github.com/qortmdgh4141/Comparing-Performance-of-Shallow-and-Deep-MLP-for-Regression-Analysis/blob/main/image/actual_data_graph.png?raw=true"  width="970" > <br/>
-   
+  
+  ```
+  # 각 변수 간 상관계수를 히트맵 그래프로 출력 
+  # s1 변수와 s2 변수들은 양의 선형적 관계를 가지는 매우 강한 상관관계를 가지고 있음
+  # s3 변수와 s4 변수들은 음의 선형적 관계를 가지는 매우 강한 상관관계를 가지고 있음
+  corr_matrix = concat_data.corr().round(2)
+
+  sns.set(rc={'figure.figsize' : (8, 5)})
+  sns.heatmap(data=corr_matrix, xticklabels=True, annot=True)
+  plt.xticks(rotation=0)
+  plt.xlabel('\n< Correlation coefficient between each variable >')
+  plt.show()
+  ```
+  
+  ```
+  # 독립 변수 간 매우 강한 상관관계를 가지는 변수가 있는 경우, 다중공선성(multicollinearity) 문제가 발생함 
+  # 따라서 변수 선택 기법을 사용하여 상관관계가 높은 변수를 제거
+  x_data = x_data.drop(['s2','s3'], axis=1) 
+  display(x_data)
+  ``` 
+  
 - _**Splitting Data**_ <br/>  
   
   ```
   # 학습용과 테스트용 데이터를 7:3으로 분리
-  x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.3, random_state=1234)
-    
-  print(f"1) 학습용 입력 데이터(X) 형상 : {x_train.shape}")
-  print(f"2) 학습용 정답 데이터(Y) 형상 : {y_train.shape}")
-  print(f"3) 평가용 입력 데이터(X) 형상 : {x_test.shape}")
-  print(f"4) 평가용 정답 데이터(Y) 형상 : {x_test.shape}")
+  x_train, x_test, y_train, y_test = train_test_split(x_data, y_data, test_size=0.3, random_state=20183047)
+  x_val, x_test, y_val, y_test = train_test_split(x_test, y_test, test_size=0.5, random_state=20183047)
+
+  print(f"- 학습용 입력 데이터(X) 형상 : {x_train.shape}")
+  print(f"- 학습용 정답 데이터(Y) 형상 : {y_train.shape}", end="\n\n")
+  print(f"- 검증용 입력 데이터(X) 형상 : {x_val.shape}")
+  print(f"- 검증용 정답 데이터(Y) 형상 : {y_val.shape}", end="\n\n") 
+  print(f"- 평가용 입력 데이터(X) 형상 : {x_test.shape}")
+  print(f"- 평가용 정답 데이터(Y) 형상 : {y_test.shape}"))   
   ```
   
 - _**Feature Scaling**_ <br/> 
   
   ```
-  # 데이터 세트의 차원을 1열 구조로 변형
-  x_train = x_train.reshape(-1, 1)
-  x_test = x_test.reshape(-1, 1)
-  y_train = y_train.reshape(-1, 1)
-  y_test = y_test.reshape(-1, 1)
+  # 최솟값은 0, 최댓값은 1이 되도록 데이터에 대해 정규화
+  # 최소-최대 정규화 스케일러 생성
+  minmax_scalerX = MinMaxScaler()
+  minmax_scalerY = MinMaxScaler()
 
-  print(f"1) 학습용 입력 데이터(X) 형상 : {x_train.shape}")
-  print(f"2) 학습용 정답 데이터(Y) 형상 : {y_train.shape}")
-  print(f"3) 평가용 입력 데이터(X) 형상 : {x_test.shape}")
-  print(f"4) 평가용 정답 데이터(Y) 형상 : {x_test.shape}")  
-     
+  # 정규화 스케일러를 학습용 데이터에 맞춤
+  minmax_scalerX.fit(x_train)
+  minmax_scalerY.fit(y_train)
+
+  # 정규화 스케일러로 학습 데이터를 변환
+  x_train_minmax = minmax_scalerX.transform(x_train)
+  y_train_minmax = minmax_scalerY.transform(y_train)
+
+  # 정규화 스케일러로 검증용 데이터를 변환
+  x_val_minmax = minmax_scalerX.transform(x_val)
+  y_val_minmax = minmax_scalerY.transform(y_val)
+
+  # 정규화 스케일러로 테스트 데이터를 변환
+  x_test_minmax = minmax_scalerX.transform(x_test)
+  y_test_minmax = minmax_scalerY.transform(y_test)
   ```
   
   ```
@@ -157,208 +213,149 @@
   ```
   <br/> 
 
-### 4. &nbsp; Training and Testing MLP Models <br/><br/>
+### 4. &nbsp; Training and Testing MLP Model <br/><br/>
 
-- _**Shallow Model**_ <br/> 
-  
+- _Optimized MLP Model_
+
   ```
   """
-  1. 입출력 노드 : 1개
-     - 학습 시에 입출력 값이 각각 1개이기 때문에, 그에 대응하는 입출력 노드도 각각 1개씩 존재
+  1. 입출력 노드 : 6개 / 1개
+     - 학습 시에 입력 변수의 특성 갯수가 8개이고, 목표 변수 갯수가 1개이기 때문에, 그에 대응하는 입출력 노드로 구성
 
-  2. 은닉층 개수 / 노드 : 1개 / 2개
-      - 총 1개의 은닉층이 존재하며 각 은닉층에는 2개의 노드가 존재
+  2. 은닉층 개수 (노드 수) : 3개 (60, 120, 60)
+      - 총 3개의 은닉층이 존재하며, 제 1 은닉층과 제 3 은닉층은 6개의 노드가 존재하고 제 2 은닉층에는 12개의 노드가 존재
 
-  3. 활성화 함수 :  로지스틱 함수(시그모이드 함수)
-     - 0과 1 사이의 값을 출력하는 S자 형태의 비선형 함수인 로지스틱 함수(시그모이드 함수)로 설정
+  3. 배치 정규화
+      - 각 층(layer)을 거칠 때마다 입력 데이터의 분포가 변화함에 따라 학습이 불안정해지는 문제인 내부 공변량(internal covariate shift)를 막기 위해 사용
+      - 각 층에서 입력 데이터를 정규화하고, 학습 중에 이에 대한 평균과 분산을 조절하여 입력 데이터의 분포를 안정화 가능
 
-  4. 최적화 알고리즘 
-     - 작은 데이터셋에서는 일반적으로 수렴 속도가 빠르고, 
-     대부분의 경우 다른 최적화 알고리즘보다 더 나은 성능을 보이는 L-BFGS (Limited-memory BFGS)를 사용
+  4. 활성화 함수 :  Relu
+     - 입력값이 0보다 작을 경우는 0으로 출력하고, 0보다 큰 경우는 그대로 출력하는 비선형 함수인 Relu 함수로 설정
+     - ReLU 활성화 함수를 사용할 때, 가중치 초기화에 따른 그래디언트 소실 문제를 완화하기 위해 은닉층의 가중치는 He 초깃값을 사용
 
-  5. 비용함수 : 
+  5. 최적화 알고리즘 
+     - Momentum과 RMSProp의 장점을 결합한 최적화 알고리즘인 Adam(Adaptive Moment Estimation)을 사용
+     - Momentum은 : 기울기의 방향을 고려하여 학습 속도를 조절 
+     - RMSProp : 기울기 크기를 고려하여 학습 속도를 조절
+
+  6. 손실 함수 : 
      - 예측값과 실제값의 차이를 제곱한 값의 평균을 계산함으로써, 
-       예측값과 실제값 사이의 오차를 잘 나타내는 MSE를 사용
+       예측값과 실제값 사이의 오차를 잘 나타내는 MSE(Mean Squared Error)를 사용
 
-  6. 최대 학습 반복 횟수 : 100회
+  7. 정확도 평가 지표
+     - 예측값과 실제값의 백분율 차이의 절대값을 평균하는 MAPE(Mean Absolute Percentage Error)를 사용
+       회귀분석에서 가장 일반적으로 사용되는 평가지표 중 상대적인 오차의 크기를 평가하므로, 
+       이 평가지표의 오차 값은 예측값과 실제값이 클수록 더 커지는 경향이 있음
+
+  8. 배치 사이즈 / 최대 학습 반복 횟수 : 64 / 1000
   """
 
-  # 모형화
-  shallow_model = MLPRegressor(hidden_layer_sizes=(2,), activation='logistic'
-                                , solver='lbfgs', max_iter=100)
+  # 모형 구조
+  model = Sequential()
 
-  # 학습
-  shallow_model.fit(x_train_norm, y_train_norm)
-  ```
-  
-  ```
-  # 예측
-  y_pred = shallow_model.predict(x_test_norm)
-  # 예측 값의 데이터를 1열 구조로 변형
-  y_pred = y_pred.reshape(-1,1)
-  # 예측 값을 실제 스케일로 역변환
-  y_pred_inverse = scalerY.inverse_transform(y_pred)
-  print(f"Shallow Model - 예측 값의 범위 : {np.min(y_pred_inverse)} ~ {np.max(y_pred_inverse)}")
-  ```
-  
-  ```
-  # 실제 값 대비 절대 오차의 평균 백분율(MAPE)로 정확도를 계산
-  # MAPE(오차 측정) 값이 0에 가까울수록 모델의 예측 성능은 일반적으로 좋다고 판단
-  shallow_model_mape = mean_absolute_percentage_error(y_test, y_pred_inverse)
-  print(f"Shallow Model - MAPE : {shallow_model_mape:.2f}")
-  ```
-  
-  ```
-  # 1~100 사이의 X값에 대응하는 Y의 실제 값과 테스트 데이터로 예측한 값을 산포도로 출력하면, 
-  # 예측 값이 실제 값과 비슷한 결과를 도출 
-  # 실제 데이터의 분포
-  plt.figure(figsize=(12, 3))
-  plt.scatter(x, y, color='g')
-  # 테스트 데이터의 분포
-  plt.scatter(x_test, y_pred_inverse, color='r')
+  model.add(Dense(60, input_dim=6, activation='relu', kernel_initializer=initializers.HeNormal()))
+  model.add(BatchNormalization())
+  model.add(Dropout(0.5))
 
-  plt.title('y=sqrt(x)')
-  plt.xlabel('X')
-  plt.ylabel('Y')
-  plt.legend(['Actual Data', 'Predicted Data by Shallow Model']) 
-  plt.show()
-  ```
-   <img src="https://github.com/qortmdgh4141/Comparing-Performance-of-Shallow-and-Deep-MLP-for-Regression-Analysis/blob/main/image/shallow_data_graph.png?raw=true"  width="960" > 
-- _**Deep Model**_ <br/> 
-  
-  ```
-  """
-  1. 입출력 노드 : 1개
-     - 학습 시에 입출력 값이 각각 1개이기 때문에, 그에 대응하는 입출력 노드도 각각 1개씩 존재
+  model.add(Dense(120, activation='relu', kernel_initializer=initializers.HeNormal()))
+  model.add(BatchNormalization())
+  model.add(Dropout(0.5))
 
-  2. 은닉층 개수 / 노드 : 4개 / 8개
-      - 총 4개의 은닉층이 존재하며 각 은닉층에는 8개의 노드가 존재
+  model.add(Dense(60, activation='relu', kernel_initializer=initializers.HeNormal()))
+  model.add(BatchNormalization())
+  model.add(Dropout(0.5))
 
-  3. 활성화 함수 :  로지스틱 함수(시그모이드 함수)
-     - 0과 1 사이의 값을 출력하는 S자 형태의 비선형 함수인 로지스틱 함수(시그모이드 함수)로 설정
+  model.add(Dense(1, bias_initializer=initializers.Constant(value=0.01)))
 
-  4. 최적화 알고리즘 
-     - 작은 데이터셋에서는 일반적으로 수렴 속도가 빠르고, 
-     대부분의 경우 다른 최적화 알고리즘보다 더 나은 성능을 보이는 L-BFGS (Limited-memory BFGS)를 사용
+  model.compile(optimizer=Adam(lr=0.0001), loss='mse')
 
-  5. 비용함수 : 
-     - 예측값과 실제값의 차이를 제곱한 값의 평균을 계산함으로써, 
-       예측값과 실제값 사이의 오차를 잘 나타내는 MSE를 사용
+  results_standard = model.fit(x_train_minmax, y_train_minmax, validation_data=(x_val_minmax, y_val_minmax)
+              , epochs=1000, batch_size=64)
+  ```
 
-  6. 최대 학습 반복 횟수 : 100회
-  """
+  ```
+  # MAPE 값 출력 
+  y_pred = model.predict(x_test_minmax)
+  y_pred_inverse = minmax_scalerY.inverse_transform(y_pred)
 
-  # 모형화
-  deep_model = MLPRegressor(hidden_layer_sizes=(8, 8, 8, 8), activation='logistic'
-                                , solver='lbfgs', max_iter=100)
-
-  # 학습
-  deep_model.fit(x_train_norm, y_train_norm)
+  minmax_mape = mean_absolute_percentage_error(y_test, y_pred_inverse)
+  print("MAPE based on min-max normalization : {:.2%}".format(minmax_mape))
   ```
-  
-  ```
-  # 예측
-  y_pred_extended = deep_model..predict(x_test_norm)
-  # 예측 값의 데이터를 1열 구조로 변형
-  y_pred_extended = y_pred_extended.reshape(-1,1)
-  # 예측 값을 실제 스케일로 역변환
-  y_pred_inversey_extended = scalerY.inverse_transform(y_pred_extended)
-  print(f"Deep Model - 예측 값의 범위 : {np.min(y_pred_inversey_extended)} ~ {np.max(y_pred_inversey_extended)}")
-  ```
-  
-  ```
-  # 실제 값 대비 절대 오차의 평균 백분율(MAPE)로 정확도를 계산
-  # MAPE(오차 측정) 값이 0에 가까울수록 모델의 예측 성능은 일반적으로 좋다고 판단
-  Deep_model_mape = mean_absolute_percentage_error(y_test, y_pred_inversey_extended)
-  print(f"Deep Model - MAPE : {shallow_model_mape:.2f}")
-  ```
-  
-  ```
-  # 1~100 사이의 X값에 대응하는 Y의 실제 값과 테스트 데이터로 예측한 값을 산포도로 출력하면, 
-  # 예측 값이 실제 값과 비슷한 결과를 도출 
-  # 실제 데이터의 분포
-  plt.figure(figsize=(12, 3))
-  plt.scatter(x, y, color='g')
-  # 테스트 데이터의 분포
-  plt.scatter(x_test, y_pred_inversey_extended, color='b')
-
-  plt.title('y=sqrt(x)')
-  plt.xlabel('X')
-  plt.ylabel('Y')
-  plt.legend(['Actual Data', 'Predicted Data by Deep Model']) 
-  plt.show()
-  ```
-  <img src="https://github.com/qortmdgh4141/Comparing-Performance-of-Shallow-and-Deep-MLP-for-Regression-Analysis/blob/main/image/deep_data_graph.png?raw=true"  width="950" > 
-  <br/>
+  <br/> 
   
 ### 5. &nbsp; Research Results  <br/><br/>
     
-- _The purpose of this study was to train and evaluate a multi-layer perceptron regression model for the function y=sqrt(x) using integers from 1 to 100 based on the hypothesis that a simpler structure may perform better on a small and simple problem. At this time, the performance of the models was evaluated using a metric called MAPE (Mean Absolute Percentage Error), which measures the average percentage error between the predicted and actual values. Just to let you know, the closer the model's predicted values are to the actual values, the lower the MAPE value and the closer the MAPE value is to 0, the better the model's performance is considered to be._ <br/><br/><br/>
+- _The purpose of this study was to train and evaluate a multilayer perceptron model on the Diabetes 130-US hospitals for years 1999-2008 Data Set. We set the number of hidden racers by referring to the optimal model structure proposed in the paper "Diabetes Mellitus Diagnosis Using Artificial Neural Networks with Fewer Features", increased the model complexity by making the number of nodes in each layer about 10 times larger than the number of nodes set in the paper, and added batch regularization and dropout layers to solve the problems of internal covariate shift and overfitting. In addition, we improved the performance of the existing model by using variable selection techniques, scaling techniques, and initialization techniques to solve multicollinearity problems and to prevent problems such as gradients vanishing._ <br/>
+
+- _The following graph shows the evolution of the loss with increasing epoch, and we can see that overfitting did not occur due to the impact of the aforementioned batch regularization and dropout layer._ <br/><br/><br/>
 
   ```
-  def gradientbars(bars, cmap_list):
-    # cmap 가중치 설정
-    grad = np.atleast_2d(np.linspace(0,1,256)).T
-    # 플롯 영역 재설정
-    ax = bars[0].axes
-    lim = ax.get_xlim()+ax.get_ylim()
-    ax.axis(lim)
-    # 각 막대에 색 입히기
-    max = 0
-    for i, bar in enumerate(bars):
-        bar.set_facecolor("none")
-        x,y = bar.get_xy()
-        w, h = bar.get_width(), bar.get_height()
-        ax.imshow(grad, extent=[x,x+w,y,y+h], aspect="auto", cmap=cmap_list[i])
-        plt.text(bar.get_width(), bar.get_y() + bar.get_height() / 2, f' ==> {df.Mape[i]:.2f}', ha='left', va='center', fontsize=10, color='black')
+  # loss 그래프 출력
+  train_loss = results_standard.history['loss']
+  val_loss = results_standard.history['val_loss']
 
-  fig, ax = plt.subplots(figsize=(8,4))
-  df = pd.DataFrame({'Model':['Shallow Model', 'Deep Model'], 'Mape':[shallow_model_mape, deep_model_mape]})
-  cmap_color = ['viridis_r', 'YlOrRd']
-  gradientbars(ax.barh(df.Model, df.Mape), cmap_color)
+  epochs = range(1, len(train_loss) + 1)
 
-  plt.title(f"Comparison of MAPE values between shallow and deep models", fontsize=12)
-  plt.xlabel('Mape', fontsize=10)
-  plt.xlim([0, 0.4])
-  plt.xticks(fontsize=10)
-  plt.yticks(fontsize=10)
-  plt.tight_layout()
+  plt.plot(epochs, train_loss, 'bo', label='Training loss')
+  plt.plot(epochs, val_loss, 'r', label='Validation loss')
+  plt.title('Training and validation loss')
+  plt.xlabel('Epochs')
+  plt.ylabel('Loss')
+  plt.ylim([0,4])
+  plt.legend()
   plt.show()
   ```
   <br/>
   
+  
+<img src="https://github.com/qortmdgh4141/Comparing-Performance-of-Shallow-and-Deep-MLP-for-Regression-Analysis/blob/main/image/shallow_deep_mape_graph.png?raw=true" width="930">
+
+- _However, it was found that underfitting occurs,  where the predictive performance on the training data does not improve because it does not sufficiently reflect the complexity of the data after some learning progress._ <br/><br/><br/>
+
+  ```
+  # 예측값 대비 실게값의 산포도
+  y_pred = model.predict(x_test_minmax)
+  diff = np.abs(y_pred - y_test_minmax)
+
+  plt.figure(figsize=(5, 5))
+  plt.scatter(y_test_minmax, y_pred, c=diff, cmap='viridis')
+  plt.plot([0, 1], [0, 1], c='r')
+  plt.xlabel('True Values')
+  plt.ylabel('Predictions')
+  plt.colorbar()
+  plt.show()
+  ```
 
 <img src="https://github.com/qortmdgh4141/Comparing-Performance-of-Shallow-and-Deep-MLP-for-Regression-Analysis/blob/main/image/shallow_deep_mape_graph.png?raw=true" width="930">
 
-- _In this study, the MAPE value for the Deep Model was 0.35, while the MAPE value for the Shallow Model was 0.01, indicating that the performance of the Shallow Model was superior._ <br/><br/><br/>
+- _However, it was found that underfitting occurs,  where the predictive performance on the training data does not improve because it does not sufficiently reflect the complexity of the data after some learning progress._ <br/><br/><br/>
 
+- _This means that the model has been oversimplified, and we believe that the following reasons contributed to this:_ <br/>
 
-  ```
-  # 1~100 사이의 X값에 대응하는 Y의 실제 값과 테스트 데이터로 예측한 값을 산포도로 출력하면, 예측 값이 실제 값과 비슷한 결과를 도출 
-  # 실제 데이터의 분포
-  plt.figure(figsize=(8, 4))
-  plt.scatter(x, y, color='g')
-  # 테스트 데이터의 분포
-  plt.scatter(x_test, y_pred_inverse, color='r')
-  plt.scatter(x_test, y_pred_inverse_extended, color='b')
-
-  plt.title('y=sqrt(x)')
-  plt.xlabel('X')
-  plt.ylabel('Y')
-  plt.legend(['Actual Data', 'Predicted Data by Shallow Model', 'Predicted Data by Deep Model'],fontsize=8)
-  plt.show()
-  ```
-  <br/>
+  - _Low Model Complexity._<br/>
   
-<img src="https://github.com/qortmdgh4141/Comparing-Performance-of-Shallow-and-Deep-MLP-for-Regression-Analysis/blob/main/image/shallow_deep_data_graph.png?raw=true" width="940">
-
-- _Furthermore, when we examine the scatter plot, most of the data predicted by the Shallow Model matches the actual data, while the Deep Model only predicts values between 6.3509680903363845 and 6.351427249440577._ <br/><br/>
+    - _We believe that underfitting occurs because the model is too simple or limited._<br/>
+    
+    - _This does not mean that making the current model structure more complex is a good solution. This is because the amount of training data is currently small, and making the model structure more complex is very likely to lead to overfitting._<br/><br/>
+    - 
+  - _Lack of Variable Diversity ._<br/>
   
-- _The reason for these results is believed to be overfitting in the Deep Model due to the simple problem and small amount of data. When predicting simple problems or with small amounts of data, a Shallow Model that does not experience overfitting may perform better, and this implies that increasing the number of parameters or deepening the network structure does not always lead to good results._ <br/><br/>
+    - _It is determined that underfitting occurred due to a lack of variable diversity in the dataset._<br/>
+    
+    - _To be more specific, I believe that excessive normalization was applied to a dataset that lacks diversity, causing the model to fail to adequately reflect the patterns in the training data._<br/> <br/> <br/>
 
-- _Therefore, it is important to design the model appropriately based on the complexity of the problem, as well as the diversity and quantity of data, as Deep Model may not always guarantee better results in all situations._ <br/> <br/> <br/>
+### 6. &nbsp; Suggestions for Future Research  <br/><br/>
+    
+- _Based on the scatter plot of predicted values compared to actual values, it can be seen that the performance of the prediction model is not very accurate. Therefore, to improve the performance of the regression model in the future, the following solutions can be suggested:_
 
+  - _Diversity and Quality of Data._<br/>
+  
+    - _The unbalanced distribution of data can greatly affect the performance of the model.Therefore, if the data is collected considering the diversity of the data and preprocessed so as not to harm the diversity of the collected data set, the performance of the model will be improved._<br/>
 
+  - _Feature Engineering._<br/>
+  
+    - _Feature engineering is known to have a significant impact on the performance of a prediction model.Therefore, by extracting more diverse and sophisticated features or introducing new variables, it is expected to improve the performance of the model._<br/> <br/> <br/>
+ 
 --------------------------
 ### 💻 S/W Development Environment
 <p>
