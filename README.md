@@ -289,9 +289,7 @@
   
 ### 5. &nbsp; Research Results  <br/><br/>
     
-- _The purpose of this study was to train and evaluate a multilayer perceptron model on the Diabetes 130-US hospitals for years 1999-2008 Data Set. I set the number of hidden racers by referring to the optimal model structure proposed in the paper "Diabetes Mellitus Diagnosis Using Artificial Neural Networks with Fewer Features", increased the model complexity by making the number of nodes in each layer about 10 times larger than the number of nodes set in the paper, and added batch regularization and dropout layers to solve the problems of internal covariate shift and overfitting. In addition, I improved the performance of the existing model by using variable selection techniques, scaling techniques, and initialization techniques to solve multicollinearity problems and to prevent problems such as gradients vanishing._ <br/>
-
-- _The following graph shows the evolution of the loss with increasing epoch, and I can see that overfitting did not occur due to the impact of the aforementioned batch regularization and dropout layer._ <br/><br/><br/>
+- _The purpose of this study was to train and evaluate a multilayer perceptron model on the Diabetes 130-US hospitals for years 1999-2008 Data Set. I set the number of hidden racers by referring to the optimal model structure proposed in the paper "Diabetes Mellitus Diagnosis Using Artificial Neural Networks with Fewer Features", increased the model complexity by making the number of nodes in each layer about 10 times larger than the number of nodes set in the paper, and added batch regularization and dropout layers to solve the problems of internal covariate shift and overfitting. In addition, I improved the performance of the existing model by using variable selection techniques, scaling techniques, and initialization techniques to solve multicollinearity problems and to prevent problems such as gradients vanishing._ <br/> <br/>
 
   ```
   # loss 그래프 출력
@@ -325,6 +323,8 @@
   ```
   <br/>
   <img src="https://github.com/qortmdgh4141/Performance-Optimization-of-MLP-Model-for-Regression-Problem/blob/main/image/scatter_plot_line_graph.png?raw=true" weight="1280">
+
+- _The following graph shows the evolution of the loss with increasing epoch, and I can see that overfitting did not occur due to the impact of the aforementioned batch regularization and dropout layer._ <br/>
 
 - _However, it was found that underfitting occurs, where the predictive performance on the training data does not improve because it does not sufficiently reflect the complexity of the data after some learning progress._ <br/>
 
@@ -373,4 +373,4 @@
 </p> 
 
 ### 💾 Datasets used in the project
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Diabetes ataset <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Diabetes Dataset <br/>
